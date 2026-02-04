@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../middleware/errorHandler";
-import coachQueries from "../../queries/coach/auth";
+import coachQueries from "../../queries/coach/player";
 import playerQueries from "../../queries/player/auth";
 
 export const getPlayers = asyncHandler(async (req: Request, res: Response) => {
