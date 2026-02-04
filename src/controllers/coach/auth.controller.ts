@@ -7,7 +7,6 @@ import coachQueries from "../../queries/coach/auth";
 import emailService from "../../services/email.service";
 import emailTemplates from "../../lib/email-templates";
 import configs from "../../config/env";
-import eventQueries from "../../queries/admin/event";
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -285,71 +284,3 @@ export const resetPassword = async (req: Request, res: Response) => {
     });
   }
 };
-
-export const getTimesheet = asyncHandler(
-  async (req: Request, res: Response) => {
-    const coachId = req.decoded.userId;
-    const { period, startDate, endDate } = req.query;
-
-    const now = new Date();
-    let start, end;
-
-    if (period === "this_week" || (!period && !startDate)) {
-      const day = now.getDay();
-      const diff = now.getDate() - day;
-      start = new Date(now.setDate(diff));
-      start.setHours(0, 0, 0, 0);
-
-      end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      end.setHours(23, 59, 59, 999);
-    } else if (period === "this_month") {
-      start = new Date(now.getFullYear(), now.getMonth(), 1);
-      end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      end.setHours(23, 59, 59, 999);
-    } else if (period === "custom" && startDate && endDate) {
-      start = new Date(startDate as string);
-      end = new Date(endDate as string);
-      end.setHours(23, 59, 59, 999);
-    } else {
-      const day = now.getDay();
-      const diff = now.getDate() - day;
-      start = new Date(now.setDate(diff));
-      start.setHours(0, 0, 0, 0);
-      end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      end.setHours(23, 59, 59, 999);
-    }
-
-    const result = await eventQueries.getTimesheet(
-      start,
-      end,
-      coachId as number,
-    );
-
-    let totalHourlyHours = 0;
-    const hoursByType: Record<string, number> = {};
-
-    result.forEach((item: any) => {
-      totalHourlyHours += item.total_hours;
-      const type = item.event_type || "Other";
-      hoursByType[type] = (hoursByType[type] || 0) + item.total_hours;
-    });
-
-    const typeBreakdown = Object.entries(hoursByType)
-      .map(([type, hours]) => `${type}: ${hours.toFixed(1)}h`)
-      .join(" • ");
-
-    return res.status(200).json({
-      message: "Timesheet fetched successfully",
-      response: {
-        data: {
-          timesheet: result,
-          total_hourly_hours: parseFloat(totalHourlyHours.toFixed(1)),
-          breakdown: typeBreakdown,
-        },
-      },
-      error: null,
-    });
-  },
-);
