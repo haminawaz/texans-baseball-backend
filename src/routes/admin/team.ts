@@ -8,7 +8,7 @@ import {
 import { verifyAdminToken } from "../../middleware/adminAuthMiddleware";
 
 const router = Router();
-// router.use(verifyAdminToken);
+router.use(verifyAdminToken);
 
 router.post(
   "/",

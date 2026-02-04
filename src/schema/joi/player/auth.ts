@@ -88,7 +88,7 @@ const guardianSchema = Joi.object({
   home_address: Joi.string().trim().allow("").max(500),
 });
 
-const profileUpdate = Joi.object({
+const playerProfileUpdate = Joi.object({
   first_name: Joi.string().trim().required().min(2).max(50).messages({
     "string.min": "First name must be at least 2 characters long",
     "string.max": "First name must be at most 50 characters long",
@@ -174,7 +174,7 @@ export const playerSchemas = {
   signup,
   login: loginSchema,
   authToken,
-  profileUpdate,
+  playerProfileUpdate,
   passwordUpdate,
   forgotPassword,
   resetPassword,

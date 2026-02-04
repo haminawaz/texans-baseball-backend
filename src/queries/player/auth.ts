@@ -31,6 +31,7 @@ const getPlayerById = async (id: number) => {
     where: { id },
     select: {
       id: true,
+      team_id: true,
       email_verified: true,
     },
   });
@@ -337,6 +338,45 @@ const deletePlayer = async (id: number) => {
   });
 };
 
+const getUsedJerseyNumbers = async (teamId: number) => {
+  const players = await prisma.players.findMany({
+    where: { team_id: teamId },
+    select: { jersey_number: true },
+  });
+  return players
+    .map((p) => p.jersey_number)
+    .filter((n): n is number => n !== null);
+};
+
+const assignPlayerToTeam = async (playerId: number, newTeamId: number) => {
+  const player = await prisma.players.findUnique({
+    where: { id: playerId },
+    select: { jersey_number: true },
+  });
+
+  if (!player) return null;
+
+  const usedNumbers = await getUsedJerseyNumbers(newTeamId);
+  let finalJerseyNumber = player.jersey_number;
+
+  if (finalJerseyNumber !== null && usedNumbers.includes(finalJerseyNumber)) {
+    for (let i = 0; i <= 99; i++) {
+      if (!usedNumbers.includes(i)) {
+        finalJerseyNumber = i;
+        break;
+      }
+    }
+  }
+
+  return prisma.players.update({
+    where: { id: playerId },
+    data: {
+      team_id: newTeamId,
+      jersey_number: finalJerseyNumber,
+    },
+  });
+};
+
 export default {
   getTeamByCode,
   getPlayerByEmail,
@@ -355,4 +395,5 @@ export default {
   resetPassword,
   getAllPlayers,
   deletePlayer,
+  assignPlayerToTeam,
 };

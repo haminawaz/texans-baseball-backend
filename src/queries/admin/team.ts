@@ -70,6 +70,13 @@ const getTeams = async (page: number, limit: number) => {
         unique_code: true,
         createdAt: true,
         updatedAt: true,
+        players: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
         coaches: {
           select: {
             coach: {
@@ -110,6 +117,17 @@ const getTeamDetails = async (id: number) => {
       unique_code: true,
       createdAt: true,
       updatedAt: true,
+      players: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          jersey_number: true,
+          positions: true,
+          height: true,
+          weight: true,
+        },
+      },
       coaches: {
         select: {
           coach: {

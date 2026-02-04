@@ -19,7 +19,7 @@ router.get("/profile", verifyUserToken, authController.getProfile);
 router.put(
   "/profile",
   verifyUserToken,
-  bodyValidator("profileUpdate"),
+  bodyValidator("playerProfileUpdate"),
   authController.updateProfile
 );
 
