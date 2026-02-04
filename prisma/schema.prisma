@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CoachRole {
+  coach
+  assistant_coach
+}
+
+enum PermissionLevel {
+  read_only
+  full_access
+}
+
+enum EventType {
+  Tournament
+  Practice
+  Social_Event
+  Strength_Conditioning
+}
+
+enum RepeatPattern {
+  Weekly
+  Every_Two_Weeks
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(50)
+  password  String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@map("admin")
+}
+
+model Coaches {
+  id                              Int             @id @default(autoincrement())
+  profile_picture                 String?         @db.VarChar(255)
+  first_name                      String          @db.VarChar(50)
+  last_name                       String          @db.VarChar(50)
+  email                           String          @unique @db.VarChar(50)
+  phone                           String?         @db.VarChar(20)
+  role                            CoachRole       @default(coach)
+  permission_level                PermissionLevel @default(read_only)
+  email_verified                  Boolean         @default(false)
+  invitation_accepted             Boolean         @default(false)
+  reset_password_token            String?         @db.VarChar(255)
+  reset_password_token_expires_at DateTime?
+  createdAt                       DateTime        @default(now())
+  updatedAt                       DateTime        @updatedAt
+
+  teams   TeamCoaches[]
+  events  Events[]
+
+  @@index([email])
+  @@map("coaches")
+}
+
+model Players {
+  id                            Int       @id @default(autoincrement())
+  team_id                       Int?
+  profile_picture               String?   @db.VarChar(255)
+  hero_image                    String?   @db.VarChar(255)
+  first_name                    String    @db.VarChar(50)
+  last_name                     String    @db.VarChar(50)
+  email                         String    @unique @db.VarChar(50)
+  password                      String    @db.Text
+  phone                         String?   @db.VarChar(50)
+  date_of_birth                 DateTime?
+  age                           Int?
+  high_school_class             String?   @db.VarChar(20)
+  positions                     String[]
+  jersey_number                 Int?
+  bat_hand                      String?   @db.VarChar(20)
+  throw_hand                    String?   @db.VarChar(20)
+  height                        String?   @db.VarChar(20)
+  weight                        String?   @db.VarChar(20)
+  high_school                   String?   @db.VarChar(20)
+  sat_score                     Int?
+  act_score                     Int?
+  gpa                           Float?
+  commited_school               String?   @db.VarChar(20)
+  instagram_handle              String?   @db.VarChar(20)
+  facebook_handle               String?   @db.VarChar(20)
+  x_handle                      String?   @db.VarChar(20)
+  email_verified                Boolean   @default(false)
+  email_verification_otp        String?   @db.VarChar(6)
+  email_verification_expires_at DateTime?
+  reset_password_otp            String?   @db.VarChar(6)
+  reset_password_expires_at     DateTime?
+  last_login_at                 DateTime?
+  createdAt                     DateTime  @default(now())
+  updatedAt                     DateTime  @updatedAt
+
+  team      Teams? @relation(fields: [team_id], references: [id], onDelete: SetNull)
+  guardians Json?  @default("[]")
+
+  @@index([email])
+  @@index([team_id])
+  @@map("players")
+}
+
+model Teams {
+  id          Int      @id @default(autoincrement())
+  logo        String?  @db.VarChar(255)
+  name        String   @db.VarChar(100)
+  age_group   String   @db.VarChar(20)
+  unique_code String   @unique @db.VarChar(6)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  coaches TeamCoaches[]
+  players Players[]
+  tryouts Tryouts[]
+  events  Events[]
+
+  @@map("teams")
+}
+
+model TeamCoaches {
+  team_id  Int
+  coach_id Int
+
+  team  Teams   @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  coach Coaches @relation(fields: [coach_id], references: [id], onDelete: Cascade)
+
+  @@id([team_id, coach_id])
+  @@map("team_coaches")
+}
+
+model Tryouts {
+  id                    Int      @id @default(autoincrement())
+  team_id               Int
+  name                  String   @db.VarChar(100)
+  age_group             String   @db.VarChar(50)
+  date                  DateTime
+  time                  String   @db.VarChar(20)
+  address               String   @db.Text
+  registration_deadline DateTime
+  notes                 String?  @db.Text
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  team Teams @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@index([team_id])
+  @@map("tryouts")
+}
+
+model Events {
+  id                   Int            @id @default(autoincrement())
+  team_id              Int
+  event_type           EventType
+  name                 String         @db.VarChar(100)
+  start_date           DateTime
+  end_date             DateTime?
+  start_time           String         @db.VarChar(20)
+  end_time             String         @db.VarChar(20)
+  location             String?        @db.VarChar(255)
+  address              String         @db.Text
+  event_link           String?        @db.Text
+  gamechanger_link     String?        @db.Text
+  notes                String?        @db.Text
+  is_recurring         Boolean        @default(false)
+  repeat_pattern       RepeatPattern?
+  repeat_days          String[]
+  end_recurrence_count Int?
+  end_recurrence_date  DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  team      Teams     @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  coaches   Coaches[]
+
+  @@map("events")
+}
