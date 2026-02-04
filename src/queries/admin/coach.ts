@@ -8,7 +8,7 @@ const getCoachByEmail = async (email: string) => {
       id: true,
       email: true,
       email_verified: true,
-      reset_password_token_expires_at: true,
+      reset_password_otp_expires_at: true,
     },
   });
 };
@@ -21,10 +21,9 @@ const createOrUpdateCoachInvitation = async (coachData: InviteCoach) => {
       last_name: coachData.last_name,
       role: coachData.role,
       permission_level: coachData.permission_level,
-      reset_password_token: coachData.reset_password_token,
-      reset_password_token_expires_at:
-        coachData.reset_password_token_expires_at,
-      invitation_accepted: false,
+      reset_password_otp: coachData.reset_password_otp,
+      reset_password_otp_expires_at:
+        coachData.reset_password_otp_expires_at,
     },
     create: {
       first_name: coachData.first_name,
@@ -32,9 +31,9 @@ const createOrUpdateCoachInvitation = async (coachData: InviteCoach) => {
       email: coachData.email,
       role: coachData.role,
       permission_level: coachData.permission_level,
-      reset_password_token: coachData.reset_password_token,
-      reset_password_token_expires_at:
-        coachData.reset_password_token_expires_at,
+      reset_password_otp: coachData.reset_password_otp,
+      reset_password_otp_expires_at:
+        coachData.reset_password_otp_expires_at,
     },
   });
 };
@@ -43,7 +42,7 @@ const getCoaches = async (page: number, limit: number, accepted: boolean) => {
   const skip = (page - 1) * limit;
   const [data, total] = await Promise.all([
     prisma.coaches.findMany({
-      where: { invitation_accepted: accepted },
+      where: { email_verified: accepted },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -54,7 +53,7 @@ const getCoaches = async (page: number, limit: number, accepted: boolean) => {
         phone: true,
         role: true,
         permission_level: true,
-        invitation_accepted: true,
+        email_verified: true,
         teams: {
           select: {
             team: {
@@ -70,7 +69,7 @@ const getCoaches = async (page: number, limit: number, accepted: boolean) => {
       take: limit,
     }),
     prisma.coaches.count({
-      where: { invitation_accepted: accepted },
+      where: { email_verified: accepted },
     }),
   ]);
 
@@ -86,7 +85,7 @@ const getCoachById = async (id: number) => {
     where: { id },
     select: {
       email: true,
-      invitation_accepted: true,
+      email_verified: true,
     },
   });
 };
@@ -101,7 +100,7 @@ const getCoachDetails = async (id: number) => {
       phone: true,
       role: true,
       permission_level: true,
-      invitation_accepted: true,
+      email_verified: true,
     },
   });
 };
@@ -169,15 +168,6 @@ const deleteCoach = async (id: number) => {
   });
 };
 
-const checkCoachesExist = async (ids: number[]) => {
-  const count = await prisma.coaches.count({
-    where: {
-      id: { in: ids },
-    },
-  });
-  return count === ids.length;
-};
-
 export default {
   getCoachByEmail,
   createOrUpdateCoachInvitation,
@@ -189,5 +179,4 @@ export default {
   getTeamCoach,
   getCoachById,
   deleteCoach,
-  checkCoachesExist,
 };

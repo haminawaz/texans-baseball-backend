@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../middleware/errorHandler";
 import teamQueries from "../../queries/admin/team";
-import coachQueries from "../../queries/admin/coach";
+import coachQueries from "../../queries/coach/auth";
 
 export const createTeam = asyncHandler(async (req: Request, res: Response) => {
   const { team_name, age_group, coach_ids } = req.body;

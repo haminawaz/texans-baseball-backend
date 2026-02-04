@@ -14,17 +14,8 @@ const generateEmailLayout = (content: string): string => {
           <td align="center">
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
               <tr>
-                <td style="background-color: #ffffff; padding: 40px 40px 30px 40px; text-align: center; border-bottom: 3px solid #735ae5;">
-                  <!-- Replace 'YOUR_LOGO_URL_HERE' with your actual hosted logo URL -->
-                  <!-- <img 
-                    src="YOUR_LOGO_URL_HERE" 
-                    alt="ShipFlex" 
-                    width="280" 
-                    height="63"
-                    style="display: block; margin: 0 auto; max-width: 100%; height: auto;" 
-                  /> -->
-                  <!-- Temporary text-based logo until you have a hosted image -->
-                  <h1 style="margin: 0; font-size: 32px; font-weight: 700; color: #735ae5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">ShipFlex</h1>
+                <td style="background-color: #ffffff; padding: 40px 40px 30px 40px; text-align: center; border-bottom: 3px solid #0081c7;">
+                  <h1 style="margin: 0; font-size: 32px; font-weight: 700; color: #0081c7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Texans Baseball</h1>
                 </td>
               </tr>
               <tr>
@@ -35,14 +26,10 @@ const generateEmailLayout = (content: string): string => {
               <tr>
                 <td style="background-color: #f8f9fa; padding: 30px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
                   <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; line-height: 1.6;">
-                    &copy; 2026 ShipFlex. All rights reserved.
-                  </p>
-                  <p style="margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.6;">
-                    123 Shipping Lane, Logistics City, LC 12345
+                    &copy; 2026 Texans Baseball. All rights reserved.
                   </p>
                   <p style="margin: 15px 0 0 0; color: #9ca3af; font-size: 12px;">
-                    This email was sent to you by ShipFlex. 
-                    <a href="#" style="color: #735ae5; text-decoration: none;">Unsubscribe</a>
+                    This email was sent to you by Texans Baseball Team.
                   </p>
                 </td>
               </tr>
@@ -114,6 +101,7 @@ export const getForgotPasswordEmailBody = (otp: number): string => {
 export const getCoachInvitationEmailBody = (
   name: string,
   inviteUrl: string,
+  otp: string,
 ): string => {
   const content = `
     <h1 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 700; color: #1f2937; line-height: 1.3;">
@@ -125,11 +113,21 @@ export const getCoachInvitationEmailBody = (
     </p>
 
     <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
-      You have been invited as a <strong>Coach</strong>.
+      You have been invited to join as a <strong>Coach</strong>.
     </p>
 
+    <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
+      Your verification code (OTP) is:
+    </p>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <span style="font-size: 32px; font-weight: 700; letter-spacing: 4px; color: #0081c7;">
+        ${otp}
+      </span>
+    </div>
+
     <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
-      Click the button below to accept your invitation and complete your registration.
+      Please click the button below to accept your invitation and enter the OTP to complete your registration.
     </p>
 
     <div style="text-align: center; margin: 32px 0;">
@@ -138,7 +136,7 @@ export const getCoachInvitationEmailBody = (
         style="
           display: inline-block;
           padding: 14px 32px;
-          background: #735ae5;
+          background: #0081c7;
           color: #ffffff;
           text-decoration: none;
           font-size: 16px;
@@ -151,7 +149,7 @@ export const getCoachInvitationEmailBody = (
     </div>
 
     <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #9ca3af;">
-      This invitation will expire in 24 hours. If you did not expect this invite, you can safely ignore this email.
+      This verification code will expire in 5 minutes. If you did not expect this invite, you can safely ignore this email.
     </p>
   `;
 

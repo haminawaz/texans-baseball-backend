@@ -6,6 +6,6 @@ export interface InviteCoach {
   email: string;
   role: CoachRole;
   permission_level: PermissionLevel;
-  reset_password_token: string;
-  reset_password_token_expires_at: Date;
+  reset_password_otp: string;
+  reset_password_otp_expires_at: Date;
 }

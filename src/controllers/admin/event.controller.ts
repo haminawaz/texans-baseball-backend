@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../middleware/errorHandler";
 import eventQueries from "../../queries/admin/event";
 import teamQueries from "../../queries/admin/team";
-import coachQueries from "../../queries/admin/coach";
+import coachQueries from "../../queries/coach/auth";
 
 export const createEvent = asyncHandler(async (req: Request, res: Response) => {
   const eventData = req.body;

@@ -14,8 +14,8 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   if (
     existingCoach &&
     (existingCoach.email_verified ||
-      (existingCoach.reset_password_token_expires_at &&
-        existingCoach.reset_password_token_expires_at > new Date()))
+      (existingCoach.reset_password_otp_expires_at &&
+        existingCoach.reset_password_otp_expires_at > new Date()))
   ) {
     return res.status(409).json({
       message: "Coach already exists",
@@ -24,14 +24,9 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  const token = Array.from(array)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  const tokenExpiry = new Date();
-  tokenExpiry.setDate(tokenExpiry.getDate() + 3);
-  const setPasswordUrl = `${configs.frontendBaseUrl}/auth/create-password?token=${token}&email=${email}`;
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+  const setPasswordUrl = `${configs.frontendBaseUrl}/auth/create-password?action=set&email=${email}`;
 
   await coachQueries.createOrUpdateCoachInvitation({
     first_name,
@@ -39,8 +34,8 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
     email,
     role,
     permission_level,
-    reset_password_token: token,
-    reset_password_token_expires_at: tokenExpiry,
+    reset_password_otp: otp,
+    reset_password_otp_expires_at: otpExpiry,
   });
 
   const fullName = `${first_name} ${last_name}`;
@@ -50,7 +45,7 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   };
 
   await emailService.sendMail(
-    emailTemplates.getCoachInvitationEmailBody(fullName, setPasswordUrl),
+    emailTemplates.getCoachInvitationEmailBody(fullName, setPasswordUrl, otp),
     dynamicData,
   );
 
@@ -147,8 +142,11 @@ export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
       error: "Team not found",
     });
   }
-  
-  const existingTeamCoach = await coachQueries.getTeamCoach(parseInt(id), parseInt(team_id));
+
+  const existingTeamCoach = await coachQueries.getTeamCoach(
+    parseInt(id),
+    parseInt(team_id),
+  );
   if (existingTeamCoach && action === "assign") {
     return res.status(409).json({
       message: "Team coach already exists",
