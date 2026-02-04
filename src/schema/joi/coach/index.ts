@@ -40,7 +40,24 @@ const coachPasswordUpdate = Joi.object({
   }),
 });
 
+const getCoachTimesheet = Joi.object({
+  period: Joi.string()
+    .valid("this_week", "this_month", "custom")
+    .default("this_week"),
+  startDate: Joi.date().iso().when("period", {
+    is: "custom",
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
+  endDate: Joi.date().iso().when("period", {
+    is: "custom",
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
+});
+
 export const coachSchemas = {
   coachProfileUpdate,
   coachPasswordUpdate,
+  getCoachTimesheet,
 };

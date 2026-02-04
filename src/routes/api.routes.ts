@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import adminRoutes from "./admin/index";
 import playerRoutes from "./player/index";
+import coachRoutes from "./coach/index";
 
 const router: Router = express.Router();
 
@@ -16,5 +17,6 @@ router.get("/", (_req: Request, res: Response) => {
 
 router.use("/admin", adminRoutes);
 router.use("/player", playerRoutes);
+router.use("/coach", coachRoutes);
 
 export default router;

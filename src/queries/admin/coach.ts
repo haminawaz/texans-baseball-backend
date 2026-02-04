@@ -53,7 +53,6 @@ const getCoaches = async (page: number, limit: number, accepted: boolean) => {
         phone: true,
         role: true,
         permission_level: true,
-        email_verified: true,
         teams: {
           select: {
             team: {
@@ -100,7 +99,6 @@ const getCoachDetails = async (id: number) => {
       phone: true,
       role: true,
       permission_level: true,
-      email_verified: true,
     },
   });
 };

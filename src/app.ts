@@ -16,6 +16,7 @@ declare global {
         userId?: number;
         email?: string;
         companyId?: number;
+        permissionLevel?: string;
       } & JwtPayload;
     }
   }

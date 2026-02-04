@@ -33,4 +33,11 @@ router.post(
   authController.resetPassword
 );
 
+router.get(
+  "/timesheet",
+  verifyUserToken,
+  queryValidator("getCoachTimesheet"),
+  authController.getTimesheet
+);
+
 export default router;

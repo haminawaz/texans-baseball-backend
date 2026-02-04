@@ -6,7 +6,7 @@ const generateEmailLayout = (content: string): string => {
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <title>ShipFlex</title>
+      <title>Texans Baseball</title>
     </head>
     <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f4; line-height: 1.6;">
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f4; padding: 20px 0;">
@@ -45,7 +45,7 @@ const generateEmailLayout = (content: string): string => {
 export const getRegistrationEmailBody = (name: string, otp: number): string => {
   const content = `
     <h1 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 700; color: #1f2937; line-height: 1.3;">
-      Welcome to ShipFlex, ${name}!
+      Welcome to Texans Baseball, ${name}!
     </h1>
     <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
       We are thrilled to have you on board. Your account has been successfully created.
@@ -149,7 +149,7 @@ export const getCoachInvitationEmailBody = (
     </div>
 
     <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #9ca3af;">
-      This verification code will expire in 5 minutes. If you did not expect this invite, you can safely ignore this email.
+      This verification code will expire in 7 days. If you did not expect this invite, you can safely ignore this email.
     </p>
   `;
 

@@ -25,7 +25,7 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const otp = crypto.randomInt(100000, 999999).toString();
-  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+  const otpExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const setPasswordUrl = `${configs.frontendBaseUrl}/auth/create-password?action=set&email=${email}`;
 
   await coachQueries.createOrUpdateCoachInvitation({

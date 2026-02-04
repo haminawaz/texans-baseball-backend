@@ -57,7 +57,7 @@ if (!isVercel) {
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
   defaultMeta: {
-    service: "shipflex-backend",
+    service: "texans-baseball-backend",
   },
   exitOnError: false,
   transports,

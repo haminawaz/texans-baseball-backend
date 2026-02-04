@@ -41,7 +41,7 @@ const verifyUserJwt =
         req.decoded = {
           ...decoded,
           userId: userData.id,
-          permission_level: userData.permission_level,
+          permissionLevel: userData.permission_level,
         };
       } else {
         return res.status(401).json({

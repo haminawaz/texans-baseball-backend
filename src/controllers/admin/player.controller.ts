@@ -67,9 +67,9 @@ export const updatePlayer = asyncHandler(
       );
       if (jerseyNumber) {
         return res.status(409).json({
-          message: "This jersey number is already in use",
+          message: "This jersey number is already in use by another player",
           response: null,
-          error: "This jersey number is already in use",
+          error: "This jersey number is already in use by another player",
         });
       }
     }
