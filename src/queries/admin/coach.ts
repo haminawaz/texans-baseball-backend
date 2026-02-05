@@ -166,6 +166,13 @@ const deleteCoach = async (id: number) => {
   });
 };
 
+const updateCoach = async (id: number, data: any) => {
+  return prisma.coaches.update({
+    where: { id },
+    data,
+  });
+};
+
 export default {
   getCoachByEmail,
   createOrUpdateCoachInvitation,
@@ -177,4 +184,5 @@ export default {
   getTeamCoach,
   getCoachById,
   deleteCoach,
+  updateCoach,
 };

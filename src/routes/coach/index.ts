@@ -3,6 +3,7 @@ import authRoutes from "./auth";
 import playerRoutes from "./player";
 import teamRoutes from "./team";
 import eventRoutes from "./event";
+import tryoutRoutes from "./tryout";
 
 const router = Router();
 
@@ -10,5 +11,6 @@ router.use("/auth", authRoutes);
 router.use("/players", playerRoutes);
 router.use("/teams", teamRoutes);
 router.use("/events", eventRoutes);
+router.use("/tryouts", tryoutRoutes);
 
 export default router;

@@ -121,7 +121,7 @@ export const getCoachTeams = asyncHandler(
   },
 );
 
-export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
+export const updateCoachTeamAccess = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { team_id, action } = req.body;
 
@@ -173,6 +173,36 @@ export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
       action === "assign"
         ? "Team assigned successfully"
         : "Team removed successfully",
+    response: null,
+    error: null,
+  });
+});
+
+export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  const existingCoach = await coachQueries.getCoachById(parseInt(id));
+  if (!existingCoach) {
+    return res.status(404).json({
+      message: "Coach not found",
+      response: null,
+      error: "Coach not found",
+    });
+  }
+
+  if (!existingCoach.email_verified) {
+    return res.status(403).json({
+      message: "Cannot update an unverified coach",
+      response: null,
+      error: "Cannot update an unverified coach",
+    });
+  }
+
+  await coachQueries.updateCoach(parseInt(id), updateData);
+
+  return res.status(200).json({
+    message: "Coach updated successfully",
     response: null,
     error: null,
   });

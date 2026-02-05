@@ -33,6 +33,13 @@ router.patch(
   coachController.updateCoach,
 );
 
+router.patch(
+  "/:id/team-access",
+  paramsValidator("idSchema"),
+  bodyValidator("updateCoachTeamAccess"),
+  coachController.updateCoachTeamAccess,
+);
+
 router.delete("/:id", paramsValidator("idSchema"), coachController.deleteCoach);
 
 export default router;
