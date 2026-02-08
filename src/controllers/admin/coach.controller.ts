@@ -6,9 +6,11 @@ import teamQueries from "../../queries/admin/team";
 import emailService from "../../services/email.service";
 import emailTemplates from "../../lib/email-templates";
 import configs from "../../config/env";
+import { deleteFileFromS3, uploadFileToS3 } from "../../lib/s3";
 
 export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   const { first_name, last_name, email, role, permission_level } = req.body;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
   const existingCoach = await coachQueries.getCoachByEmail(email);
   if (
@@ -28,12 +30,19 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   const otpExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const setPasswordUrl = `${configs.frontendBaseUrl}/auth/create-password?action=set&email=${email}`;
 
+  let profilePicUrl = "";
+  if (files && files.profile_picture?.[0]) {
+    profilePicUrl = await uploadFileToS3(files.profile_picture[0], "coaches/profiles");
+  }
+  console.log("profilePicUrl", profilePicUrl)
+
   await coachQueries.createOrUpdateCoachInvitation({
     first_name,
     last_name,
     email,
     role,
     permission_level,
+    profile_picture: profilePicUrl,
     reset_password_otp: otp,
     reset_password_otp_expires_at: otpExpiry,
   });
@@ -181,6 +190,7 @@ export const updateCoachTeamAccess = asyncHandler(async (req: Request, res: Resp
 export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const updateData = req.body;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
   const existingCoach = await coachQueries.getCoachById(parseInt(id));
   if (!existingCoach) {
@@ -197,6 +207,14 @@ export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
       response: null,
       error: "Cannot update an unverified coach",
     });
+  }
+
+  if (files && files.profile_picture?.[0]) {
+    if (existingCoach.profile_picture) {
+      await deleteFileFromS3(existingCoach.profile_picture);
+    }
+    const profilePicUrl = await uploadFileToS3(files.profile_picture[0], "coaches/profiles");
+    updateData.profile_picture = profilePicUrl;
   }
 
   await coachQueries.updateCoach(parseInt(id), updateData);

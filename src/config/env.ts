@@ -14,6 +14,10 @@ interface Config {
   rateLimitMaxRequests: number;
   gmailUser: string;
   gmailPassword: string;
+  awsAccessKeyId: string;
+  awsSecretAccessKey: string;
+  awsRegion: string;
+  awsBucketName: string;
 }
 
 const config: Config = {
@@ -31,6 +35,10 @@ const config: Config = {
     process.env.RATE_LIMIT_MAX_REQUESTS as string,
     10
   ),
+  awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+  awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+  awsRegion: process.env.AWS_REGION as string,
+  awsBucketName: process.env.AWS_BUCKET_NAME as string,
 };
 
 export default config;

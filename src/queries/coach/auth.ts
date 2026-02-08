@@ -23,6 +23,7 @@ const getCoachById = async (id: number) => {
       id: true,
       permission_level: true,
       email_verified: true,
+      profile_picture: true,
     },
   });
 };
@@ -37,8 +38,8 @@ const getCoachWithPassword = async (email: string) => {
       last_name: true,
       phone: true,
       password: true,
-
       email_verified: true,
+      profile_picture: true,
     },
   });
 };

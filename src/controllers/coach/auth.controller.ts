@@ -6,6 +6,7 @@ import { asyncHandler } from "../../middleware/errorHandler";
 import coachQueries from "../../queries/coach/auth";
 import emailService from "../../services/email.service";
 import emailTemplates from "../../lib/email-templates";
+import { uploadFileToS3, deleteFileFromS3 } from "../../lib/s3";
 import configs from "../../config/env";
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
@@ -52,6 +53,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     first_name: coach.first_name,
     last_name: coach.last_name,
     phone: coach.phone,
+    profile_picture: coach.profile_picture,
   };
 
   const data = {
@@ -70,14 +72,23 @@ export const updateProfile = async (req: Request, res: Response) => {
   try {
     const coachId = req.decoded.userId as number;
     const updateData = req.body;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
     const coach = await coachQueries.getCoachById(coachId);
     if (!coach) {
       return res.status(404).json({
         message: "Coach not found",
         response: null,
-        error: "Player not found",
+        error: "Coach not found",
       });
+    }
+
+    if (files && files.profile_picture?.[0]) {
+      if (coach.profile_picture) {
+        await deleteFileFromS3(coach.profile_picture);
+      }
+      const profilePicUrl = await uploadFileToS3(files.profile_picture[0], "coaches/profiles");
+      updateData.profile_picture = profilePicUrl;
     }
 
     const updatedProfile = await coachQueries.updateProfile({

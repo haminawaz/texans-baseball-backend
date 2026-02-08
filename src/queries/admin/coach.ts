@@ -21,6 +21,7 @@ const createOrUpdateCoachInvitation = async (coachData: InviteCoach) => {
       last_name: coachData.last_name,
       role: coachData.role,
       permission_level: coachData.permission_level,
+      profile_picture: coachData.profile_picture,
       reset_password_otp: coachData.reset_password_otp,
       reset_password_otp_expires_at:
         coachData.reset_password_otp_expires_at,
@@ -31,6 +32,7 @@ const createOrUpdateCoachInvitation = async (coachData: InviteCoach) => {
       email: coachData.email,
       role: coachData.role,
       permission_level: coachData.permission_level,
+      profile_picture: coachData.profile_picture,
       reset_password_otp: coachData.reset_password_otp,
       reset_password_otp_expires_at:
         coachData.reset_password_otp_expires_at,
@@ -84,6 +86,7 @@ const getCoachById = async (id: number) => {
     where: { id },
     select: {
       email: true,
+      profile_picture: true,
       email_verified: true,
     },
   });
@@ -93,8 +96,10 @@ const getCoachDetails = async (id: number) => {
   return prisma.coaches.findUnique({
     where: { id },
     select: {
+      id: true,
       first_name: true,
       last_name: true,
+      profile_picture: true,
       email: true,
       phone: true,
       role: true,

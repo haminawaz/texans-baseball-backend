@@ -92,5 +92,5 @@ export const adminCoachSchemas = {
       "any.required": "Permission level is required",
       "any.only": "Permission level must be either 'read_only' or 'full_access'",
     }),
-  }).min(1),
+  }),
 };

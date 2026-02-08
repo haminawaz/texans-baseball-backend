@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as authController from "../../controllers/coach/auth.controller";
 import { bodyValidator, queryValidator } from "../../middleware/joi";
 import { verifyUserToken } from "../../middleware/coachAuthMiddleware";
+import { upload } from "../../middleware/upload";
 const router = Router();
 
 router.post("/login", bodyValidator("login"), authController.login);
@@ -9,6 +10,9 @@ router.post("/login", bodyValidator("login"), authController.login);
 router.put(
   "/profile",
   verifyUserToken,
+  upload.fields([
+    { name: "profile_picture", maxCount: 1 },
+  ]),
   bodyValidator("coachProfileUpdate"),
   authController.updateProfile
 );
