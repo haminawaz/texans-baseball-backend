@@ -32,9 +32,12 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
 
   let profilePicUrl = "";
   if (files && files.profile_picture?.[0]) {
-    profilePicUrl = await uploadFileToS3(files.profile_picture[0], "coaches/profiles");
+    profilePicUrl = await uploadFileToS3(
+      files.profile_picture[0],
+      "coaches/profiles",
+    );
   }
-  console.log("profilePicUrl", profilePicUrl)
+  console.log("profilePicUrl", profilePicUrl);
 
   await coachQueries.createOrUpdateCoachInvitation({
     first_name,
@@ -130,62 +133,64 @@ export const getCoachTeams = asyncHandler(
   },
 );
 
-export const updateCoachTeamAccess = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { team_id, action } = req.body;
+export const updateCoachTeamAccess = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { team_id, action } = req.body;
 
-  const existingCoach = await coachQueries.getCoachById(parseInt(id));
-  if (!existingCoach) {
-    return res.status(404).json({
-      message: "Coach not found",
+    const existingCoach = await coachQueries.getCoachById(parseInt(id));
+    if (!existingCoach) {
+      return res.status(404).json({
+        message: "Coach not found",
+        response: null,
+        error: "Coach not found",
+      });
+    }
+
+    const existingTeam = await teamQueries.getTeamById(parseInt(team_id));
+    if (!existingTeam) {
+      return res.status(404).json({
+        message: "Team not found",
+        response: null,
+        error: "Team not found",
+      });
+    }
+
+    const existingTeamCoach = await coachQueries.getTeamCoach(
+      parseInt(id),
+      parseInt(team_id),
+    );
+    if (existingTeamCoach && action === "assign") {
+      return res.status(409).json({
+        message: "Team coach already exists",
+        response: null,
+        error: "Team coach already exists",
+      });
+    }
+    if (!existingTeamCoach && action === "remove") {
+      return res.status(404).json({
+        message: "Team coach not found",
+        response: null,
+        error: "Team coach not found",
+      });
+    }
+
+    if (action === "assign") {
+      await coachQueries.assignTeam(parseInt(id), team_id);
+    } else if (action === "remove") {
+      await coachQueries.removeTeam(parseInt(id), team_id);
+    }
+
+    return res.status(200).json({
+      message:
+        action === "assign"
+          ? "Team assigned successfully"
+          : "Team removed successfully",
       response: null,
-      error: "Coach not found",
+      error: null,
     });
-  }
-
-  const existingTeam = await teamQueries.getTeamById(parseInt(team_id));
-  if (!existingTeam) {
-    return res.status(404).json({
-      message: "Team not found",
-      response: null,
-      error: "Team not found",
-    });
-  }
-
-  const existingTeamCoach = await coachQueries.getTeamCoach(
-    parseInt(id),
-    parseInt(team_id),
-  );
-  if (existingTeamCoach && action === "assign") {
-    return res.status(409).json({
-      message: "Team coach already exists",
-      response: null,
-      error: "Team coach already exists",
-    });
-  }
-  if (!existingTeamCoach && action === "remove") {
-    return res.status(404).json({
-      message: "Team coach not found",
-      response: null,
-      error: "Team coach not found",
-    });
-  }
-
-  if (action === "assign") {
-    await coachQueries.assignTeam(parseInt(id), team_id);
-  } else if (action === "remove") {
-    await coachQueries.removeTeam(parseInt(id), team_id);
-  }
-
-  return res.status(200).json({
-    message:
-      action === "assign"
-        ? "Team assigned successfully"
-        : "Team removed successfully",
-    response: null,
-    error: null,
-  });
-});
+  },
+);
 
 export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -213,7 +218,10 @@ export const updateCoach = asyncHandler(async (req: Request, res: Response) => {
     if (existingCoach.profile_picture) {
       await deleteFileFromS3(existingCoach.profile_picture);
     }
-    const profilePicUrl = await uploadFileToS3(files.profile_picture[0], "coaches/profiles");
+    const profilePicUrl = await uploadFileToS3(
+      files.profile_picture[0],
+      "coaches/profiles",
+    );
     updateData.profile_picture = profilePicUrl;
   }
 
@@ -238,6 +246,9 @@ export const deleteCoach = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
+  if (existingCoach.profile_picture) {
+    await deleteFileFromS3(existingCoach.profile_picture);
+  }
   await coachQueries.deleteCoach(parseInt(id));
 
   return res.status(200).json({

@@ -45,6 +45,23 @@ const bodyValidator = (validator: Validator) => {
 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      if (req.headers["content-type"]?.includes("multipart/form-data")) {
+        for (const key in req.body) {
+          const value = req.body[key];
+          if (typeof value === "string") {
+            const trimmedValue = value.trim();
+            if (
+              (trimmedValue.startsWith("[") && trimmedValue.endsWith("]")) ||
+              (trimmedValue.startsWith("{") && trimmedValue.endsWith("}"))
+            ) {
+              try {
+                req.body[key] = JSON.parse(trimmedValue);
+              } catch (e) {
+              }
+            }
+          }
+        }
+      }
       req.body = await _validate(req.body, validator);
       return next();
     } catch (error: unknown) {

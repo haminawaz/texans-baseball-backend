@@ -33,6 +33,8 @@ const getPlayerById = async (id: number) => {
       id: true,
       team_id: true,
       email_verified: true,
+      profile_picture: true,
+      hero_image: true,
     },
   });
 };
@@ -288,6 +290,7 @@ const getAllPlayers = async (
         id: true,
         first_name: true,
         last_name: true,
+        profile_picture: true,
         jersey_number: true,
         age: true,
         positions: true,
@@ -310,6 +313,7 @@ const getAllPlayers = async (
     id: player.id,
     first_name: player.first_name,
     last_name: player.last_name,
+    profile_picture: player.profile_picture,
     jersey_number: player.jersey_number,
     age: player.age,
     positions: player.positions,

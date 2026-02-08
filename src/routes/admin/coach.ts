@@ -13,10 +13,10 @@ router.use(verifyAdminToken);
 
 router.post(
   "/invite",
-  bodyValidator("inviteCoach"),
   upload.fields([
     { name: "profile_picture", maxCount: 1 },
   ]),
+  bodyValidator("inviteCoach"),
   coachController.inviteCoach,
 );
 
@@ -32,11 +32,11 @@ router.get(
 
 router.patch(
   "/:id",
-  paramsValidator("idSchema"),
-  bodyValidator("updateCoach"),
   upload.fields([
     { name: "profile_picture", maxCount: 1 },
   ]),
+  paramsValidator("idSchema"),
+  bodyValidator("updateCoach"),
   coachController.updateCoach,
 );
 

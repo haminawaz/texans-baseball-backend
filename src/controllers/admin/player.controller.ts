@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../middleware/errorHandler";
 import teamQueries from "../../queries/admin/team";
 import playerQueries from "../../queries/player/auth";
+import { deleteFileFromS3, uploadFileToS3 } from "../../lib/s3";
 
 export const getPlayers = asyncHandler(async (req: Request, res: Response) => {
   const name = req.query.name as string;
@@ -50,6 +51,7 @@ export const updatePlayer = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     const updateData = req.body;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
     const player = await playerQueries.getPlayerById(parseInt(id));
     if (!player) {
@@ -72,6 +74,28 @@ export const updatePlayer = asyncHandler(
           error: "This jersey number is already in use by another player",
         });
       }
+    }
+
+    if (files && files.profile_picture?.[0]) {
+      if (player.profile_picture) {
+        await deleteFileFromS3(player.profile_picture);
+      }
+      const profilePicUrl = await uploadFileToS3(
+        files.profile_picture[0],
+        "players/profiles",
+      );
+      updateData.profile_picture = profilePicUrl;
+    }
+
+    if (files && files.hero_image?.[0]) {
+      if (player.hero_image) {
+        await deleteFileFromS3(player.hero_image);
+      }
+      const heroImageUrl = await uploadFileToS3(
+        files.hero_image[0],
+        "players/heros",
+      );
+      updateData.hero_image = heroImageUrl;
     }
 
     await playerQueries.updateProfile({
@@ -137,6 +161,13 @@ export const deletePlayer = asyncHandler(
         response: null,
         error: "Player not found",
       });
+    }
+
+    if (player.profile_picture) {
+      await deleteFileFromS3(player.profile_picture);
+    }
+    if (player.hero_image) {
+      await deleteFileFromS3(player.hero_image);
     }
 
     await playerQueries.deletePlayer(parseInt(id));
