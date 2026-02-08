@@ -10,7 +10,6 @@ import { deleteFileFromS3, uploadFileToS3 } from "../../lib/s3";
 
 export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   const { first_name, last_name, email, role, permission_level } = req.body;
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
   const existingCoach = await coachQueries.getCoachByEmail(email);
   if (
@@ -30,22 +29,12 @@ export const inviteCoach = asyncHandler(async (req: Request, res: Response) => {
   const otpExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const setPasswordUrl = `${configs.frontendBaseUrl}/auth/create-password?action=set&email=${email}`;
 
-  let profilePicUrl = "";
-  if (files && files.profile_picture?.[0]) {
-    profilePicUrl = await uploadFileToS3(
-      files.profile_picture[0],
-      "coaches/profiles",
-    );
-  }
-  console.log("profilePicUrl", profilePicUrl);
-
   await coachQueries.createOrUpdateCoachInvitation({
     first_name,
     last_name,
     email,
     role,
     permission_level,
-    profile_picture: profilePicUrl,
     reset_password_otp: otp,
     reset_password_otp_expires_at: otpExpiry,
   });

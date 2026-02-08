@@ -13,9 +13,6 @@ router.use(verifyAdminToken);
 
 router.post(
   "/invite",
-  upload.fields([
-    { name: "profile_picture", maxCount: 1 },
-  ]),
   bodyValidator("inviteCoach"),
   coachController.inviteCoach,
 );
