@@ -57,7 +57,7 @@ const getPlayerWithPassword = async (email: string) => {
       email: true,
       first_name: true,
       last_name: true,
-      phone: true,
+      profile_picture: true,
       password: true,
       email_verified: true,
     },

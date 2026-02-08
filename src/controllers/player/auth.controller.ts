@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { asyncHandler } from "../../middleware/errorHandler";
 import playerQueries from "../../queries/player/auth";
 import emailService from "../../services/email.service";
+import { uploadFileToS3, deleteFileFromS3 } from "../../lib/s3";
 import emailTemplates from "../../lib/email-templates";
 import configs from "../../config/env";
 
@@ -143,7 +144,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     email: player.email,
     first_name: player.first_name,
     last_name: player.last_name,
-    phone: player.phone,
+    profile_picture: player.profile_picture,
   };
 
   const data = {
@@ -187,6 +188,7 @@ export const updateProfile = async (req: Request, res: Response) => {
   try {
     const playerId = req.decoded.userId as number;
     const updateData = req.body;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
     const player = await playerQueries.getPlayerById(playerId);
     if (!player) {
@@ -197,16 +199,34 @@ export const updateProfile = async (req: Request, res: Response) => {
       });
     }
 
-    const jerseyNumber = await playerQueries.getJerseyNumber(
-      playerId,
-      updateData.jersey_number,
-    );
-    if (jerseyNumber) {
-      return res.status(409).json({
-        message: "This jersey number is already in use by another player",
-        response: null,
-        error: "This jersey number is already in use by another player",
-      });
+    if (updateData.jersey_number) {
+      const jerseyNumber = await playerQueries.getJerseyNumber(
+        playerId,
+        updateData.jersey_number
+      );
+      if (jerseyNumber) {
+        return res.status(409).json({
+          message: "This jersey number is already in use by another player",
+          response: null,
+          error: "This jersey number is already in use by another player",
+        });
+      }
+    }
+
+    if (files && files.profile_picture?.[0]) {
+      if (player.profile_picture) {
+        await deleteFileFromS3(player.profile_picture);
+      }
+      const profilePicUrl = await uploadFileToS3(files.profile_picture[0], "players/profiles");
+      updateData.profile_picture = profilePicUrl;
+    }
+
+    if (files && files.hero_image?.[0]) {
+      if (player.hero_image) {
+        await deleteFileFromS3(player.hero_image);
+      }
+      const heroImageUrl = await uploadFileToS3(files.hero_image[0], "players/heros");
+      updateData.hero_image = heroImageUrl;
     }
 
     const updatedProfile = await playerQueries.updateProfile({

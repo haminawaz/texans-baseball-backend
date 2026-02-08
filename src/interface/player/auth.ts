@@ -40,6 +40,8 @@ export interface UpdatePlayer {
   instagram_handle?: string;
   facebook_handle?: string;
   guardians?: Guardian[];
+  profile_picture?: string;
+  hero_image?: string;
 }
 
 export interface ForgotPassword {
