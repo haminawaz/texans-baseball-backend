@@ -70,7 +70,6 @@ const getCoachPlayers = async (coachId: number, filters: any) => {
           select: {
             id: true,
             name: true,
-            logo: true,
           },
         },
       },

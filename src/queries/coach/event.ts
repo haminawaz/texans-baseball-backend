@@ -82,7 +82,6 @@ const getCoachEvents = async (
         select: {
           id: true,
           name: true,
-          logo: true,
         },
       },
       coaches: {

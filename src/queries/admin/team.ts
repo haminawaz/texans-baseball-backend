@@ -64,7 +64,6 @@ const getTeams = async (page: number, limit: number) => {
       take: limit,
       select: {
         id: true,
-        logo: true,
         name: true,
         age_group: true,
         unique_code: true,

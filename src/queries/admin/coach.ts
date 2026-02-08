@@ -119,7 +119,6 @@ const getCoachTeams = async (id: number) => {
               id: true,
               name: true,
               age_group: true,
-              logo: true,
             },
           },
         },

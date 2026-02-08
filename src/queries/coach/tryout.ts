@@ -46,7 +46,6 @@ const getCoachTryouts = async (coachId: number, page: number, limit: number) => 
           select: {
             id: true,
             name: true,
-            logo: true,
           },
         },
       },

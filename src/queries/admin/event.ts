@@ -17,7 +17,6 @@ const createEvent = async (eventData: CreateEvent) => {
         select: {
           id: true,
           name: true,
-          logo: true,
         },
       },
       coaches: {
@@ -80,7 +79,6 @@ const getEvents = async (teamId?: number, date?: Date) => {
         select: {
           id: true,
           name: true,
-          logo: true,
         },
       },
       coaches: {
@@ -175,7 +173,6 @@ const updateEvent = async (id: number, eventData: UpdateEvent) => {
         select: {
           id: true,
           name: true,
-          logo: true,
         },
       },
       coaches: {

@@ -37,7 +37,6 @@ const getTryoutById = async (id: number) => {
         select: {
           id: true,
           name: true,
-          logo: true,
         },
       },
     },
