@@ -35,6 +35,13 @@ router.patch(
   teamController.updateTeam,
 );
 
+router.patch(
+  "/:id/picture",
+  paramsValidator("idSchema"),
+  bodyValidator("updateTeamPicture"),
+  teamController.updateTeamPicture,
+);
+
 router.delete(
   "/:id",
   paramsValidator("idSchema"),

@@ -112,6 +112,7 @@ model Teams {
   name        String   @db.VarChar(100)
   age_group   String   @db.VarChar(20)
   unique_code String   @unique @db.VarChar(6)
+  team_pictures_url String?   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

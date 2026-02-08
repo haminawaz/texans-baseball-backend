@@ -137,6 +137,40 @@ export const updateTeam = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const updateTeamPicture = asyncHandler(
+  async (req: Request, res: Response) => {
+    const coachId = req.decoded.userId as number;
+    const { id } = req.params;
+    const teamId = parseInt(id);
+    const { team_pictures_url } = req.body;
+
+    if (req.decoded.permissionLevel === "read_only") {
+      return res.status(403).json({
+        message: "You do not have permission to update the team",
+        response: null,
+        error: "You do not have permission to update the team",
+      });
+    }
+
+    const hasAccess = await coachQueries.checkTeamAccess(coachId, teamId);
+    if (!hasAccess) {
+      return res.status(403).json({
+        message: "You do not have access to this team",
+        response: null,
+        error: "You do not have access to this team",
+      });
+    }
+
+    await teamQueries.updateTeamPicture(teamId, team_pictures_url);
+
+    return res.status(200).json({
+      message: "Team picture updated successfully",
+      response: null,
+      error: null,
+    });
+  },
+);
+
 export const deleteTeam = asyncHandler(async (req: Request, res: Response) => {
   const coachId = req.decoded.userId as number;
   const { id } = req.params;

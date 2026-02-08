@@ -116,6 +116,30 @@ export const updateTeam = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const updateTeamPicture = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { team_pictures_url } = req.body;
+
+    const existingTeam = await teamQueries.getTeamById(parseInt(id));
+    if (!existingTeam) {
+      return res.status(404).json({
+        message: "Team not found",
+        response: null,
+        error: "Team not found",
+      });
+    }
+
+    await teamQueries.updateTeamPicture(parseInt(id), team_pictures_url);
+
+    return res.status(200).json({
+      message: "Team picture updated successfully",
+      response: null,
+      error: null,
+    });
+  },
+);
+
 export const deleteTeam = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 

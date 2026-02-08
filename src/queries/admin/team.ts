@@ -114,6 +114,7 @@ const getTeamDetails = async (id: number) => {
       name: true,
       age_group: true,
       unique_code: true,
+      team_pictures_url: true,
       createdAt: true,
       updatedAt: true,
       players: {
@@ -248,6 +249,15 @@ const updateTeam = async (
   });
 };
 
+const updateTeamPicture = async (id: number, team_pictures_url: string) => {
+  return prisma.teams.update({
+    where: { id },
+    data: {
+      team_pictures_url,
+    },
+  });
+};
+
 const deleteTeam = async (id: number) => {
   return prisma.teams.delete({
     where: { id },
@@ -260,5 +270,6 @@ export default {
   getTeamById,
   getTeamDetails,
   updateTeam,
+  updateTeamPicture,
   deleteTeam,
 };

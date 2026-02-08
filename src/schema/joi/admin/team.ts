@@ -15,4 +15,10 @@ export const adminTeamSchemas = {
     age_group: Joi.string().trim(),
     coach_ids: Joi.array().items(Joi.number().integer()).unique().optional(),
   }),
+  updateTeamPicture: Joi.object({
+    team_pictures_url: Joi.string().uri().required().messages({
+      "any.required": "Team picture URL is required",
+      "string.uri": "Team picture URL must be a valid URI",
+    }),
+  }),
 };
