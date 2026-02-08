@@ -139,7 +139,24 @@ const getPlayerTeamsheet = async (
   };
 };
 
+const getTeammates = async (teamId: number) => {
+  return prisma.players.findMany({
+    where: { team_id: teamId },
+    select: {
+      id: true,
+      profile_picture: true,
+      first_name: true,
+      last_name: true,
+      high_school_class: true,
+    },
+    orderBy: [
+      { first_name: 'asc' },
+    ],
+  });
+};
+
 export default {
   getPlayerTeam,
   getPlayerTeamsheet,
+  getTeammates,
 };

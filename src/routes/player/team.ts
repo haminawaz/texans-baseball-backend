@@ -6,5 +6,6 @@ const router = Router();
 router.use(verifyUserToken);
 
 router.get("/", teamController.getTeam);
+router.get("/players", teamController.getTeammates);
 
 export default router;

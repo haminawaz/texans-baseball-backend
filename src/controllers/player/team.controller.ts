@@ -85,3 +85,27 @@ export const getTeam = asyncHandler(async (req: Request, res: Response) => {
     error: null,
   });
 });
+
+export const getTeammates = asyncHandler(async (req: Request, res: Response) => {
+  const playerId = req.decoded.userId as number;
+
+  const player = await playerTeamQueries.getPlayerTeam(playerId);
+  if (!player?.team) {
+    return res.status(404).json({
+      message: "You are not assigned to any team",
+      response: null,
+      error: "You are not assigned to any team",
+    });
+  }
+
+  const teamId = player.team.id;
+  const teammates = await playerTeamQueries.getTeammates(teamId);
+
+  return res.status(200).json({
+    message: "Teammates fetched successfully",
+    response: {
+      data: teammates,
+    },
+    error: null,
+  });
+});
