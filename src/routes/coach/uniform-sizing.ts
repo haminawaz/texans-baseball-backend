@@ -10,6 +10,15 @@ import { verifyUserToken } from "../../middleware/coachAuthMiddleware";
 const router = Router();
 router.use(verifyUserToken);
 
+router.get("/", verifyUserToken, uniformSizingController.getUniformSizing);
+
+router.put(
+  "/",
+  verifyUserToken,
+  bodyValidator("coachUniformSizingUpdate"),
+  uniformSizingController.updateUniformSizing,
+);
+
 router.get(
   "/players",
   queryValidator("getPlayerListSchema"),

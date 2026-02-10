@@ -34,6 +34,9 @@ const createOrUpdateCoachInvitation = async (coachData: InviteCoach) => {
       reset_password_otp: coachData.reset_password_otp,
       reset_password_otp_expires_at:
         coachData.reset_password_otp_expires_at,
+      uniform_sizing: {
+        create: {},
+      },
     },
   });
 };

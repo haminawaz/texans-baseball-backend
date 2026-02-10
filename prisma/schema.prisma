@@ -58,6 +58,7 @@ model Coaches {
 
   teams   TeamCoaches[]
   events  Events[]
+  uniform_sizing CoachUniformSizing?
 
   @@index([email])
   @@map("coaches")
@@ -208,4 +209,21 @@ model PlayerUniformSizing {
 
   @@index([player_id])
   @@map("player_uniform_sizing")
+}
+
+model CoachUniformSizing {
+  id            Int      @id @default(autoincrement())
+  coach_id      Int      @unique
+  hat_size      String?  @db.VarChar(20)
+  shirt_size    String?  @db.VarChar(20)
+  short_size    String?  @db.VarChar(20)
+  long_sleeves  String?  @db.VarChar(20)
+  hoodie_size   String?  @db.VarChar(20)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  coach Coaches @relation(fields: [coach_id], references: [id], onDelete: Cascade)
+
+  @@index([coach_id])
+  @@map("coach_uniform_sizing")
 }

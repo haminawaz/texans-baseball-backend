@@ -1,6 +1,48 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../middleware/errorHandler";
+import coachUniformSizingQueries from "../../queries/coach/uniform-sizing";
 import uniformSizingQueries from "../../queries/admin/uniform-sizing";
+
+export const getUniformSizing = asyncHandler(
+  async (req: Request, res: Response) => {
+    const coachId = req.decoded.userId as number;
+
+    const sizing = await coachUniformSizingQueries.getUniformSizing(coachId);
+
+    return res.status(200).json({
+      message: "Uniform sizing fetched successfully",
+      response: {
+        data: sizing,
+      },
+      error: null,
+    });
+  },
+);
+
+export const updateUniformSizing = asyncHandler(
+  async (req: Request, res: Response) => {
+    const coachId = req.decoded.userId as number;
+    const updateData = req.body;
+
+    const updatedSizing = await coachUniformSizingQueries.updateUniformSizing({
+      coach_id: coachId,
+      ...updateData,
+    });
+    if (!updatedSizing) {
+      return res.status(400).json({
+        message: "Failed to update uniform sizing",
+        response: null,
+        error: "Failed to update uniform sizing",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Uniform sizing updated successfully",
+      response: null,
+      error: null,
+    });
+  },
+);
 
 export const getAllPlayersUniformSizing = asyncHandler(
   async (req: Request, res: Response) => {

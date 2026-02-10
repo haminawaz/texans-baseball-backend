@@ -142,7 +142,6 @@ const uniformSizingUpdate = Joi.object({
     .allow(null, "")
     .messages({
       "any.only": "Invalid batting glove size",
-      "any.required": "Batting glove is required",
     }),
 });
 
