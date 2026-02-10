@@ -202,7 +202,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     if (updateData.jersey_number) {
       const jerseyNumber = await playerQueries.getJerseyNumber(
         playerId,
-        updateData.jersey_number
+        updateData.jersey_number,
       );
       if (jerseyNumber) {
         return res.status(409).json({
@@ -217,7 +217,10 @@ export const updateProfile = async (req: Request, res: Response) => {
       if (player.profile_picture) {
         await deleteFileFromS3(player.profile_picture);
       }
-      const profilePicUrl = await uploadFileToS3(files.profile_picture[0], "players/profiles");
+      const profilePicUrl = await uploadFileToS3(
+        files.profile_picture[0],
+        "players/profiles",
+      );
       updateData.profile_picture = profilePicUrl;
     }
 
@@ -225,7 +228,10 @@ export const updateProfile = async (req: Request, res: Response) => {
       if (player.hero_image) {
         await deleteFileFromS3(player.hero_image);
       }
-      const heroImageUrl = await uploadFileToS3(files.hero_image[0], "players/heros");
+      const heroImageUrl = await uploadFileToS3(
+        files.hero_image[0],
+        "players/heros",
+      );
       updateData.hero_image = heroImageUrl;
     }
 

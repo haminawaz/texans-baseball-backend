@@ -101,6 +101,7 @@ model Players {
 
   team      Teams? @relation(fields: [team_id], references: [id], onDelete: SetNull)
   guardians Json?  @default("[]")
+  uniform_sizing PlayerUniformSizing?
 
   @@index([email])
   @@index([team_id])
@@ -180,4 +181,31 @@ model Events {
   coaches   Coaches[]
 
   @@map("events")
+}
+
+model PlayerUniformSizing {
+  id               Int      @id @default(autoincrement())
+  player_id        Int      @unique
+  jersey_size      String?   @db.VarChar(20)
+  hat_size         String?   @db.VarChar(20)
+  helmet_size      String?   @db.VarChar(20)
+  helmet_side      String?   @db.VarChar(20)
+  jersey_pants     String?   @db.VarChar(20)
+  pant_style       String?   @db.VarChar(50)
+  shirt_size       String?   @db.VarChar(20)
+  short_size       String?   @db.VarChar(20)
+  youth_belt       String?   @db.VarChar(20)
+  adult_belt       String?   @db.VarChar(20)
+  sock_size        String?   @db.VarChar(20)
+  shoe_size        String?   @db.VarChar(20)
+  sweater_jacket   String?   @db.VarChar(20)
+  is_catcher       Boolean  @default(false)
+  batting_glove    String?   @db.VarChar(20)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  player Players @relation(fields: [player_id], references: [id], onDelete: Cascade)
+
+  @@index([player_id])
+  @@map("player_uniform_sizing")
 }

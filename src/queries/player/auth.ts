@@ -75,7 +75,7 @@ const updateLastLogin = async (playerId: number) => {
 
 const createOrUpdatePlayerTransaction = async (playerData: RegisterPlayer) => {
   return prisma.$transaction(async (tx) => {
-    return tx.players.upsert({
+    const player = await tx.players.upsert({
       where: { email: playerData.email },
       update: {
         first_name: playerData.first_name,
@@ -95,6 +95,20 @@ const createOrUpdatePlayerTransaction = async (playerData: RegisterPlayer) => {
         email_verification_expires_at: playerData.email_verification_otp_expiry,
       },
     });
+
+    const existingSizing = await tx.playerUniformSizing.findUnique({
+      where: { player_id: player.id },
+    });
+
+    if (!existingSizing) {
+      await tx.playerUniformSizing.create({
+        data: {
+          player_id: player.id,
+        },
+      });
+    }
+
+    return player;
   });
 };
 
@@ -263,7 +277,7 @@ const resetPassword = async (resetPassword: ResetPassword) => {
 const getAllPlayers = async (
   name?: string,
   teamId?: number,
-  position?: string
+  position?: string,
 ) => {
   const where: any = {};
 
@@ -319,10 +333,7 @@ const getAllPlayers = async (
     positions: player.positions,
     email: player.email,
     phone: player.phone,
-    physical: [
-      { weight: player.weight },
-      { height: player.height },
-    ],
+    physical: [{ weight: player.weight }, { height: player.height }],
     school_info: {
       high_school: player.high_school,
       high_school_class: player.high_school_class,
