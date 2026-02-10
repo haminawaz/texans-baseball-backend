@@ -4,6 +4,7 @@ import playerRoutes from "./player";
 import teamRoutes from "./team";
 import eventRoutes from "./event";
 import tryoutRoutes from "./tryout";
+import uniformSizingRoutes from "./uniform-sizing";
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.use("/players", playerRoutes);
 router.use("/teams", teamRoutes);
 router.use("/events", eventRoutes);
 router.use("/tryouts", tryoutRoutes);
+router.use("/uniform-sizing", uniformSizingRoutes);
 
 export default router;
