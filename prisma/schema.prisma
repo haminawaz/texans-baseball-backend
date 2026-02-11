@@ -29,6 +29,12 @@ enum RepeatPattern {
   Every_Two_Weeks
 }
 
+enum InvitationStatus {
+  pending
+  accepted
+  declined
+}
+
 model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique @db.VarChar(50)
@@ -41,23 +47,23 @@ model Admin {
 }
 
 model Coaches {
-  id                              Int             @id @default(autoincrement())
-  profile_picture                 String?         @db.VarChar(255)
-  first_name                      String          @db.VarChar(50)
-  last_name                       String          @db.VarChar(50)
-  email                           String          @unique @db.VarChar(50)
-  phone                           String?         @db.VarChar(20)
-  password                        String?         @db.Text
-  role                            CoachRole       @default(coach)
-  permission_level                PermissionLevel @default(read_only)
-  email_verified                  Boolean         @default(false)
-  reset_password_otp              String?         @db.VarChar(6)
-  reset_password_otp_expires_at   DateTime?
-  createdAt                       DateTime        @default(now())
-  updatedAt                       DateTime        @updatedAt
+  id                            Int             @id @default(autoincrement())
+  profile_picture               String?         @db.VarChar(255)
+  first_name                    String          @db.VarChar(50)
+  last_name                     String          @db.VarChar(50)
+  email                         String          @unique @db.VarChar(50)
+  phone                         String?         @db.VarChar(20)
+  password                      String?         @db.Text
+  role                          CoachRole       @default(coach)
+  permission_level              PermissionLevel @default(read_only)
+  email_verified                Boolean         @default(false)
+  reset_password_otp            String?         @db.VarChar(6)
+  reset_password_otp_expires_at DateTime?
+  createdAt                     DateTime        @default(now())
+  updatedAt                     DateTime        @updatedAt
 
-  teams   TeamCoaches[]
-  events  Events[]
+  teams          TeamCoaches[]
+  events         Events[]
   uniform_sizing CoachUniformSizing?
 
   @@index([email])
@@ -100,8 +106,9 @@ model Players {
   createdAt                     DateTime  @default(now())
   updatedAt                     DateTime  @updatedAt
 
-  team      Teams? @relation(fields: [team_id], references: [id], onDelete: SetNull)
-  guardians Json?  @default("[]")
+  team           Teams?               @relation(fields: [team_id], references: [id], onDelete: SetNull)
+  guardians      Json?                @default("[]")
+  parents        PlayerParents[]
   uniform_sizing PlayerUniformSizing?
 
   @@index([email])
@@ -110,13 +117,13 @@ model Players {
 }
 
 model Teams {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  age_group   String   @db.VarChar(20)
-  unique_code String   @unique @db.VarChar(6)
-  team_pictures_url String?   @db.VarChar(255)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  name              String   @db.VarChar(100)
+  age_group         String   @db.VarChar(20)
+  unique_code       String   @unique @db.VarChar(6)
+  team_pictures_url String?  @db.VarChar(255)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   coaches TeamCoaches[]
   players Players[]
@@ -178,32 +185,32 @@ model Events {
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
 
-  team      Teams     @relation(fields: [team_id], references: [id], onDelete: Cascade)
-  coaches   Coaches[]
+  team    Teams     @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  coaches Coaches[]
 
   @@map("events")
 }
 
 model PlayerUniformSizing {
-  id               Int      @id @default(autoincrement())
-  player_id        Int      @unique
-  jersey_size      String?   @db.VarChar(20)
-  hat_size         String?   @db.VarChar(20)
-  helmet_size      String?   @db.VarChar(20)
-  helmet_side      String?   @db.VarChar(20)
-  jersey_pants     String?   @db.VarChar(20)
-  pant_style       String?   @db.VarChar(50)
-  shirt_size       String?   @db.VarChar(20)
-  short_size       String?   @db.VarChar(20)
-  youth_belt       String?   @db.VarChar(20)
-  adult_belt       String?   @db.VarChar(20)
-  sock_size        String?   @db.VarChar(20)
-  shoe_size        String?   @db.VarChar(20)
-  sweater_jacket   String?   @db.VarChar(20)
-  is_catcher       Boolean  @default(false)
-  batting_glove    String?   @db.VarChar(20)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  player_id      Int      @unique
+  jersey_size    String?  @db.VarChar(20)
+  hat_size       String?  @db.VarChar(20)
+  helmet_size    String?  @db.VarChar(20)
+  helmet_side    String?  @db.VarChar(20)
+  jersey_pants   String?  @db.VarChar(20)
+  pant_style     String?  @db.VarChar(50)
+  shirt_size     String?  @db.VarChar(20)
+  short_size     String?  @db.VarChar(20)
+  youth_belt     String?  @db.VarChar(20)
+  adult_belt     String?  @db.VarChar(20)
+  sock_size      String?  @db.VarChar(20)
+  shoe_size      String?  @db.VarChar(20)
+  sweater_jacket String?  @db.VarChar(20)
+  is_catcher     Boolean  @default(false)
+  batting_glove  String?  @db.VarChar(20)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   player Players @relation(fields: [player_id], references: [id], onDelete: Cascade)
 
@@ -212,18 +219,53 @@ model PlayerUniformSizing {
 }
 
 model CoachUniformSizing {
-  id            Int      @id @default(autoincrement())
-  coach_id      Int      @unique
-  hat_size      String?  @db.VarChar(20)
-  shirt_size    String?  @db.VarChar(20)
-  short_size    String?  @db.VarChar(20)
-  long_sleeves  String?  @db.VarChar(20)
-  hoodie_size   String?  @db.VarChar(20)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  coach_id     Int      @unique
+  hat_size     String?  @db.VarChar(20)
+  shirt_size   String?  @db.VarChar(20)
+  short_size   String?  @db.VarChar(20)
+  long_sleeves String?  @db.VarChar(20)
+  hoodie_size  String?  @db.VarChar(20)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   coach Coaches @relation(fields: [coach_id], references: [id], onDelete: Cascade)
 
   @@index([coach_id])
   @@map("coach_uniform_sizing")
+}
+
+model Parents {
+  id                        Int       @id @default(autoincrement())
+  first_name                String    @db.VarChar(50)
+  last_name                 String    @db.VarChar(50)
+  email                     String    @unique @db.VarChar(50)
+  password                  String    @db.Text
+  email_verified            Boolean   @default(false)
+  reset_password_otp        String?   @db.VarChar(6)
+  reset_password_expires_at DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  players PlayerParents[]
+
+  @@index([email])
+  @@map("parents")
+}
+
+model PlayerParents {
+  player_id             Int
+  parent_id             Int
+  relationship          String?          @db.VarChar(50)
+  invitation_token      String?          @db.VarChar(255)
+  invitation_expires_at DateTime?
+  invitation_status     InvitationStatus @default(pending)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  player Players @relation(fields: [player_id], references: [id], onDelete: Cascade)
+  parent Parents @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+
+  @@id([player_id, parent_id])
+  @@map("player_parents")
 }

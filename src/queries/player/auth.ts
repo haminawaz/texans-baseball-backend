@@ -31,6 +31,8 @@ const getPlayerById = async (id: number) => {
     where: { id },
     select: {
       id: true,
+      first_name: true,
+      last_name: true,
       team_id: true,
       email_verified: true,
       profile_picture: true,

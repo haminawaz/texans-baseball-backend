@@ -186,9 +186,58 @@ export const getResetPasswordEmailBody = (): string => {
   return generateEmailLayout(content);
 };
 
+export const getParentInvitationEmailBody = (
+  parentName: string,
+  playerName: string,
+  inviteUrl: string,
+): string => {
+  const content = `
+    <h1 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 700; color: #1f2937; line-height: 1.3;">
+      Parent Invitation
+    </h1>
+
+    <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
+      Hello ${parentName},
+    </p>
+
+    <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
+      You have been invited by <strong>${playerName}</strong> to join as a parent guardian on Texans Baseball.
+    </p>
+
+    <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
+      Please click the button below to accept the invitation and set up your account.
+    </p>
+
+    <div style="text-align: center; margin: 32px 0;">
+      <a 
+        href="${inviteUrl}"
+        style="
+          display: inline-block;
+          padding: 14px 32px;
+          background: #0081c7;
+          color: #ffffff;
+          text-decoration: none;
+          font-size: 16px;
+          font-weight: 600;
+          border-radius: 8px;
+        "
+      >
+        Accept Invitation
+      </a>
+    </div>
+
+    <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #9ca3af;">
+      If you did not expect this invite, you can safely ignore this email.
+    </p>
+  `;
+
+  return generateEmailLayout(content);
+};
+
 export default {
   getRegistrationEmailBody,
   getForgotPasswordEmailBody,
   getResetPasswordEmailBody,
   getCoachInvitationEmailBody,
+  getParentInvitationEmailBody,
 };
