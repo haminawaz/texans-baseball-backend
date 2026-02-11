@@ -1,4 +1,5 @@
 import { playerSchemas } from "./player/auth";
+import { parentSchemas } from "./parent/auth";
 import { playerUniformSizingSchemas } from "./player/uniform-sizing";
 import * as playerParentSchemas from "./player/parent";
 import { coachSchemas } from "./coach";
@@ -14,6 +15,7 @@ export default {
   ...playerSchemas,
   ...playerUniformSizingSchemas,
   ...playerParentSchemas,
+  ...parentSchemas,
   ...coachSchemas,
   ...coachUniformSizingSchemas,
   ...adminCoachSchemas,

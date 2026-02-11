@@ -10,6 +10,17 @@ const getParentByEmail = async (email: string) => {
       last_name: true,
       email: true,
       email_verified: true,
+      email_verification_otp: true,
+      email_verification_expires_at: true,
+    },
+  });
+};
+
+const getPlayerById = async (playerId: number) => {
+  return prisma.players.findUnique({
+    where: { id: playerId },
+    select: {
+      id: true,
     },
   });
 };
@@ -60,14 +71,22 @@ const createParent = async (player_id: number, data: CreateParent) => {
 };
 
 const createPlayerParent = async (data: CreatePlayerParent) => {
-  return prisma.playerParents.update({
+  return prisma.playerParents.upsert({
     where: {
       player_id_parent_id: {
         player_id: data.player_id,
         parent_id: data.parent_id,
       },
     },
-    data: {
+    update: {
+      relationship: data.relationship,
+      invitation_token: data.invitation_token,
+      invitation_expires_at: data.invitation_expires_at,
+      invitation_status: "pending",
+    },
+    create: {
+      player_id: data.player_id,
+      parent_id: data.parent_id,
       relationship: data.relationship,
       invitation_token: data.invitation_token,
       invitation_expires_at: data.invitation_expires_at,
@@ -107,6 +126,7 @@ const removeParentLink = async (playerId: number, parentId: number) => {
 
 export default {
   getParentByEmail,
+  getPlayerById,
   getParentLink,
   createParent,
   createPlayerParent,
