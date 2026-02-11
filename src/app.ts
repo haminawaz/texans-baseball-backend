@@ -12,6 +12,7 @@ declare global {
   namespace Express {
     interface Request {
       id?: string;
+      playerId?: number;
       decoded: {
         userId?: number;
         email?: string;

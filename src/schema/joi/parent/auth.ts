@@ -7,12 +7,14 @@ export const parentSchemas = {
       "any.required": "Team code is required",
     }),
   }),
+
   invitationAccept: Joi.object({
     invitation_token: Joi.string().required().messages({
       "string.empty": "Invitation token is required",
       "any.required": "Invitation token is required",
     }),
   }),
+
   parentSignup: Joi.object({
     first_name: Joi.string().trim().required().min(2).max(50).messages({
       "string.min": "First name must be at least 2 characters long",
@@ -61,6 +63,7 @@ export const parentSchemas = {
           "Relationship must be one of parent, guardian, grandparent, sibling, other",
       }),
   }),
+
   parentResetPasswordQuery: Joi.object({
     email: Joi.string().email().required().messages({
       "string.empty": "Email is required",
@@ -72,6 +75,14 @@ export const parentSchemas = {
     }),
     action: Joi.string().valid("reset", "set").default("reset").messages({
       "any.only": "Action must be reset or set",
+    }),
+  }),
+
+  playerIdSchema: Joi.object({
+    playerId: Joi.number().integer().required().messages({
+      "number.base": "Player ID must be a number",
+      "number.integer": "Player ID must be an integer",
+      "number.required": "Player ID is required",
     }),
   }),
 };
