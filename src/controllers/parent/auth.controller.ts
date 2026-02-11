@@ -359,3 +359,17 @@ export const resetPassword = asyncHandler(
     });
   },
 );
+
+export const getPlayers = asyncHandler(async (req: Request, res: Response) => {
+  const parentId = req.decoded.userId as number;
+
+  const players = await authQueries.getPlayersForParent(parentId);
+
+  return res.status(200).json({
+    message: "Players fetched successfully",
+    response: {
+      data: players,
+    },
+    error: null,
+  });
+});

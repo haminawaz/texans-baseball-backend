@@ -1,6 +1,16 @@
 import prisma from "../../lib/prisma";
 import { ForgotPassword, ParentSignup, ResetPassword } from "../../interface/parent/auth";
 
+const getParentForJwt = async (email: string) => {
+  return prisma.parents.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email_verified: true,
+    },
+  });
+};
+
 const getPlayersByTeamCode = async (teamCode: string) => {
   const team = await prisma.teams.findUnique({
     where: { unique_code: teamCode },
@@ -147,7 +157,26 @@ const acceptInvitation = async (playerId: number, parentId: number) => {
   });
 };
 
+const getPlayersForParent = async (parentId: number) => {
+  return prisma.playerParents.findMany({
+    where: { parent_id: parentId },
+    select: {
+      relationship: true,
+      invitation_status: true,
+      player: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          profile_picture: true,
+        },
+      },
+    },
+  });
+};
+
 export default {
+  getParentForJwt,
   getPlayersByTeamCode,
   getParentWithPassword,
   parentSignup,
@@ -156,4 +185,5 @@ export default {
   resetPassword,
   getPlayerParentByToken,
   acceptInvitation,
+  getPlayersForParent,
 };
