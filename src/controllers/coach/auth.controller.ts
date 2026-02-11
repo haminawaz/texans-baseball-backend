@@ -196,13 +196,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
         error: "Coach not found",
       });
     }
-    if (!coach.email_verified) {
-      return res.status(403).json({
-        message: "Please verify your email",
-        response: null,
-        error: "Please verify your email",
-      });
-    }
 
     const otp = crypto.randomInt(100000, 999999).toString();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
@@ -212,18 +205,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
       reset_password_otp: otp,
       reset_password_otp_expiry: otpExpiry,
     });
+    const action = coach.email_verified ? "reset" : "set";
+    const resetUrl = `${configs.frontendBaseUrl}/coach/reset-password?email=${encodeURIComponent(email)}&otp=${otp}&action=${action}`;
 
     const dynamicData = {
-      subject: "Reset your password",
+      subject: action === "set" ? "Set your password" : "Reset your password",
       to_email: email,
     };
     await emailService.sendMail(
-      emailTemplates.getForgotPasswordEmailBody(Number(otp)),
+      emailTemplates.getForgotPasswordEmailBody(Number(otp), resetUrl, action),
       dynamicData,
     );
 
     return res.status(200).json({
-      message: `Email has been sent successfully for reset password`,
+      message: `Email has been sent successfully for ${action} password`,
       response: null,
       error: null,
     });

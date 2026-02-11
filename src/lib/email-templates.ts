@@ -70,25 +70,47 @@ export const getRegistrationEmailBody = (name: string, otp: number): string => {
   return generateEmailLayout(content);
 };
 
-export const getForgotPasswordEmailBody = (otp: number): string => {
+export const getForgotPasswordEmailBody = (
+  otp: number,
+  resetUrl: string,
+  action: string,
+): string => {
   const content = `
     <h1 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 700; color: #1f2937; line-height: 1.3;">
-      Password Reset Request
+      ${action === "set" ? "Set Your Password" : "Password Reset Request"}
     </h1>
     <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
-      We received a request to reset your password. If you didn't make this request, you can safely ignore this email.
+      We received a request to ${action} your password. If you didn't make this request, you can safely ignore this email.
     </p>
     <p style="margin: 0 0 28px 0; font-size: 16px; line-height: 1.6; color: #4b5563;">
-      To reset your password, use the verification code below:
+      To ${action} your password, you can either click the button below or use the verification code:
     </p>
     
     <div style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-left: 4px solid #667eea; padding: 24px; border-radius: 8px; margin: 24px 0;">
       <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">
-        Your Password Reset Code
+        Your Password ${action === "set" ? "Set" : "Reset"} Code
       </p>
       <p style="margin: 0; font-size: 36px; font-weight: 700; color: #667eea; letter-spacing: 4px; font-family: 'Courier New', monospace;">
         ${otp}
       </p>
+    </div>
+
+    <div style="text-align: center; margin: 32px 0;">
+      <a 
+        href="${resetUrl}"
+        style="
+          display: inline-block;
+          padding: 14px 32px;
+          background: #0081c7;
+          color: #ffffff;
+          text-decoration: none;
+          font-size: 16px;
+          font-weight: 600;
+          border-radius: 8px;
+        "
+      >
+        ${action === "set" ? "Set Password" : "Reset Password"}
+      </a>
     </div>
     
     <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #ef4444; font-weight: 500;">

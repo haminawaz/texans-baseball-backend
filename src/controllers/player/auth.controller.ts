@@ -343,6 +343,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const otp = crypto.randomInt(100000, 999999).toString();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    const resetUrl = `${configs.frontendBaseUrl}/player/reset-password?email=${encodeURIComponent(email)}&otp=${otp}`;
 
     await playerQueries.forgotPassword({
       player_id: player.id,
@@ -355,7 +356,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       to_email: email,
     };
     await emailService.sendMail(
-      emailTemplates.getForgotPasswordEmailBody(Number(otp)),
+      emailTemplates.getForgotPasswordEmailBody(Number(otp), resetUrl, "reset"),
       dynamicData,
     );
 
