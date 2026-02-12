@@ -40,9 +40,6 @@ export const commonSchemas = {
       "string.empty": "Type cannot be empty",
       "any.only": "Type must be one of: one_to_one, group, team",
     }),
-    name: Joi.string().optional().allow(null, "").messages({
-      "string.empty": "Name cannot be empty",
-    }),
     team_id: Joi.number().optional().allow(null).messages({
       "number.base": "Team ID must be a number",
     }),

@@ -11,15 +11,15 @@ router.get("/threads", messagingController.getThreads);
 router.get("/threads/:threadId/messages", messagingController.getMessages);
 
 router.post(
-  "/send",
-  bodyValidator("sendMessage"),
-  messagingController.sendMessage,
-);
-
-router.post(
   "/threads",
   bodyValidator("createThread"),
   messagingController.createThread,
+);
+
+router.post(
+  "/send",
+  bodyValidator("sendMessage"),
+  messagingController.sendMessage,
 );
 
 router.post(

@@ -7,7 +7,6 @@ CREATE TYPE "MessageSenderType" AS ENUM ('coach', 'player');
 -- CreateTable
 CREATE TABLE "threads" (
     "id" SERIAL NOT NULL,
-    "name" VARCHAR(100),
     "type" "ThreadType" NOT NULL DEFAULT 'one_to_one',
     "team_id" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

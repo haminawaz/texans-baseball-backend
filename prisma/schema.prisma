@@ -294,7 +294,6 @@ model PlayerParents {
 
 model Threads {
   id        Int        @id @default(autoincrement())
-  name      String?    @db.VarChar(100)
   type      ThreadType @default(one_to_one)
   team_id   Int?
   createdAt DateTime   @default(now())

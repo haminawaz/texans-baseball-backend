@@ -1,15 +1,21 @@
+import http from "http";
 import app from "./app";
 import config from "./config/env";
 import logger from "./services/logger.service";
 import connectDB from "./config/database";
+import { initSocket } from "./services/socket.service";
 
 connectDB();
 let server: any;
+let httpServer: http.Server;
 
 const startServer = () => {
-  server = app.listen(config.port, () => {
+  httpServer = http.createServer(app);
+  initSocket(httpServer);
+
+  server = httpServer.listen(config.port, () => {
     logger.info(
-      `Server running in ${config.nodeEnv} mode on port ${config.port}`
+      `Server running in ${config.nodeEnv} mode on port ${config.port}`,
     );
   });
 };
