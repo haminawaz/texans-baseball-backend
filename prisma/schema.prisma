@@ -35,6 +35,17 @@ enum InvitationStatus {
   declined
 }
 
+enum ThreadType {
+  one_to_one
+  group
+  team
+}
+
+enum MessageSenderType {
+  coach
+  player
+}
+
 model Admin {
   id        Int      @id @default(autoincrement())
   email     String   @unique @db.VarChar(50)
@@ -65,6 +76,10 @@ model Coaches {
   teams          TeamCoaches[]
   events         Events[]
   uniform_sizing CoachUniformSizing?
+
+  sent_messages       Messages[]
+  thread_participants ThreadParticipants[]
+  message_reactions   MessageReactions[]
 
   @@index([email])
   @@map("coaches")
@@ -111,6 +126,10 @@ model Players {
   parents        PlayerParents[]
   uniform_sizing PlayerUniformSizing?
 
+  sent_messages       Messages[]
+  thread_participants ThreadParticipants[]
+  message_reactions   MessageReactions[]
+
   @@index([email])
   @@index([team_id])
   @@map("players")
@@ -129,6 +148,7 @@ model Teams {
   players Players[]
   tryouts Tryouts[]
   events  Events[]
+  threads Threads[]
 
   @@map("teams")
 }
@@ -270,4 +290,66 @@ model PlayerParents {
 
   @@id([player_id, parent_id])
   @@map("player_parents")
+}
+
+model Threads {
+  id        Int        @id @default(autoincrement())
+  name      String?    @db.VarChar(100)
+  type      ThreadType @default(one_to_one)
+  team_id   Int?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  team         Teams?               @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  messages     Messages[]
+  participants ThreadParticipants[]
+
+  @@map("threads")
+}
+
+model ThreadParticipants {
+  id        Int  @id @default(autoincrement())
+  thread_id Int
+  coach_id  Int?
+  player_id Int?
+
+  thread Threads  @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+  coach  Coaches? @relation(fields: [coach_id], references: [id], onDelete: Cascade)
+  player Players? @relation(fields: [player_id], references: [id], onDelete: Cascade)
+
+  @@map("thread_participants")
+}
+
+model Messages {
+  id          Int               @id @default(autoincrement())
+  thread_id   Int
+  sender_type MessageSenderType
+  coach_id    Int?
+  player_id   Int?
+  content     String            @db.Text
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  thread    Threads            @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+  coach     Coaches?           @relation(fields: [coach_id], references: [id], onDelete: SetNull)
+  player    Players?           @relation(fields: [player_id], references: [id], onDelete: SetNull)
+  reactions MessageReactions[]
+
+  @@map("messages")
+}
+
+model MessageReactions {
+  id          Int               @id @default(autoincrement())
+  message_id  Int
+  emoji       String            @db.VarChar(10)
+  sender_type MessageSenderType
+  coach_id    Int?
+  player_id   Int?
+  createdAt   DateTime          @default(now())
+
+  message Messages @relation(fields: [message_id], references: [id], onDelete: Cascade)
+  coach   Coaches? @relation(fields: [coach_id], references: [id], onDelete: Cascade)
+  player  Players? @relation(fields: [player_id], references: [id], onDelete: Cascade)
+
+  @@map("message_reactions")
 }
