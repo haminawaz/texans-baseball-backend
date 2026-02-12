@@ -350,5 +350,7 @@ model MessageReactions {
   coach   Coaches? @relation(fields: [coach_id], references: [id], onDelete: Cascade)
   player  Players? @relation(fields: [player_id], references: [id], onDelete: Cascade)
 
+  @@unique([message_id, coach_id])
+  @@unique([message_id, player_id])
   @@map("message_reactions")
 }

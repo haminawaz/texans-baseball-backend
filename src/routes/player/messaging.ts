@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as messagingController from "../../controllers/messaging.controller";
-import { bodyValidator } from "../../middleware/joi";
+import { bodyValidator, paramsValidator } from "../../middleware/joi";
 import { verifyUserToken } from "../../middleware/authMiddleware";
 
 const router = Router();
@@ -26,6 +26,24 @@ router.post(
   "/reactions",
   bodyValidator("addReaction"),
   messagingController.addReaction,
+);
+
+router.delete(
+  "/reactions/:reactionId",
+  paramsValidator("reactionIdSchema"),
+  messagingController.removeReaction,
+);
+
+router.delete(
+  "/:messageId",
+  paramsValidator("messageIdSchema"),
+  messagingController.deleteMessage,
+);
+
+router.delete(
+  "/threads/:threadId",
+  paramsValidator("threadIdSchema"),
+  messagingController.deleteThread,
 );
 
 export default router;
