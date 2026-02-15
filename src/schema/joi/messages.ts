@@ -14,11 +14,15 @@ export const messageSchemas = {
   }),
 
   createThread: Joi.object({
-    type: Joi.string().valid("one_to_one", "group", "team").default("one_to_one").required().messages({
-      "string.empty": "Type cannot be empty",
-      "any.only": "Type must be one of: one_to_one, group, team",
-      "any.required": "Type is required",
-    }),
+    type: Joi.string()
+      .valid("one_to_one", "group", "team")
+      .default("one_to_one")
+      .required()
+      .messages({
+        "string.empty": "Type cannot be empty",
+        "any.only": "Type must be one of: one_to_one, group, team",
+        "any.required": "Type is required",
+      }),
     team_id: Joi.number()
       .when("type", {
         is: "team",
@@ -94,6 +98,19 @@ export const messageSchemas = {
   }),
 
   threadIdSchema: Joi.object({
+    threadId: Joi.number().integer().required().messages({
+      "number.base": "Thread ID must be a number",
+      "number.integer": "Thread ID must be an integer",
+      "any.required": "Thread ID is required",
+    }),
+  }),
+
+  getParentPlayerMessageSchema: Joi.object({
+    playerId: Joi.number().integer().required().messages({
+      "number.base": "Player ID must be a number",
+      "number.integer": "Player ID must be an integer",
+      "any.required": "Player ID is required",
+    }),
     threadId: Joi.number().integer().required().messages({
       "number.base": "Thread ID must be a number",
       "number.integer": "Thread ID must be an integer",

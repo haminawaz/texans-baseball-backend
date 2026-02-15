@@ -7,7 +7,7 @@ export const commonSchemas = {
       "number.integer": "Page must be an integer",
       "number.min": "Page must be at least 1",
     }),
-    pageSize: Joi.number().integer().min(1).max(100).default(10).messages({
+    pageSize: Joi.number().integer().min(1).max(100).messages({
       "number.base": "Page size must be a number",
       "number.integer": "Page size must be an integer",
       "number.min": "Page size must be at least 1",

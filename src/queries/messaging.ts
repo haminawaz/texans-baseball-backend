@@ -36,6 +36,42 @@ const getThreads = async (userId: number, role: "coach" | "player") => {
   });
 };
 
+const getAllThreads = async (limit: number, skip: number) => {
+  return prisma.threads.findMany({
+    take: limit,
+    skip: skip,
+    orderBy: { updatedAt: "desc" },
+    include: {
+      team: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      participants: {
+        include: {
+          coach: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              profile_picture: true,
+            },
+          },
+          player: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              profile_picture: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 const getMessages = async (
   threadId: number,
   limit: number = 50,
@@ -295,6 +331,15 @@ const removeReaction = async (reactionId: number) => {
   });
 };
 
+const getThread = async (threadId: number) => {
+  return prisma.threads.findUnique({
+    where: { id: threadId },
+    select: {
+      id: true,
+    }
+  });
+};
+
 const getMessage = async (messageId: number) => {
   return prisma.messages.findUnique({
     where: { id: messageId },
@@ -346,6 +391,7 @@ const removeThread = async (threadId: number) => {
 
 export default {
   getThreads,
+  getAllThreads,
   getMessages,
   validateThreadParticipants,
   createThread,
@@ -355,6 +401,7 @@ export default {
   getMessageWithThread,
   getReaction,
   removeReaction,
+  getThread,
   getMessage,
   removeMessage,
   removeThread,

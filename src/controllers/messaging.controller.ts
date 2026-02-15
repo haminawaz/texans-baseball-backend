@@ -27,9 +27,18 @@ export const getMessages = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.decoded.userId as number;
   const role = req.decoded.permissionLevel ? "coach" : "player";
 
-  const limit = parseInt(req.query.limit as string) || 50;
+  const limit = parseInt(req.query.pageSize as string) || 50;
   const page = parseInt(req.query.page as string) || 1;
   const skip = (page - 1) * limit;
+
+  const thread = await messagingQueries.getThread(parseInt(threadId));
+  if (!thread) {
+    return res.status(404).json({
+      message: "Thread not found",
+      response: null,
+      error: "Thread not found",
+    });
+  }
 
   const messages = await messagingQueries.getMessages(
     parseInt(threadId),
@@ -177,115 +186,136 @@ export const addReaction = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-export const removeReaction = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.decoded.userId as number;
-  const { reactionId } = req.params;
-  const role = req.decoded.permissionLevel ? "coach" : "player";
+export const removeReaction = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.decoded.userId as number;
+    const { reactionId } = req.params;
+    const role = req.decoded.permissionLevel ? "coach" : "player";
 
-  try {
-    const reaction = await messagingQueries.getReaction(parseInt(reactionId));
-    if (!reaction) {
-      return res.status(404).json({
-        message: "Reaction not found",
+    try {
+      const reaction = await messagingQueries.getReaction(parseInt(reactionId));
+      if (!reaction) {
+        return res.status(404).json({
+          message: "Reaction not found",
+          response: null,
+          error: "Reaction not found",
+        });
+      }
+      const isOwner =
+        role === "coach"
+          ? reaction.coach_id === userId
+          : reaction.player_id === userId;
+      if (!isOwner) {
+        return res.status(404).json({
+          message: "Reaction not found",
+          response: null,
+          error: "Reaction not found",
+        });
+      }
+
+      await messagingQueries.removeReaction(parseInt(reactionId));
+      emitToThread(reaction.message.thread_id, "reaction_removed", {
+        reactionId,
+      });
+
+      return res.status(200).json({
+        message: "Reaction removed successfully",
         response: null,
-        error: "Reaction not found",
+        error: null,
+      });
+    } catch (error: any) {
+      const statusCode = error.message === "Thread not found" ? 404 : 403;
+      return res.status(statusCode).json({
+        message: error.message || "Failed to remove reaction",
+        response: null,
+        error: error.message,
       });
     }
-    const isOwner =
-      role === "coach"
-        ? reaction.coach_id === userId
-        : reaction.player_id === userId;
-    if (!isOwner) {
-      return res.status(404).json({
-        message: "Reaction not found",
+  },
+);
+
+export const deleteMessage = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.decoded.userId as number;
+    const { messageId } = req.params;
+    const role = req.decoded.permissionLevel ? "coach" : "player";
+
+    try {
+      const message = await messagingQueries.getMessage(parseInt(messageId));
+      if (!message) {
+        return res.status(404).json({
+          message: "Message not found",
+          response: null,
+          error: "Message not found",
+        });
+      }
+      const isOwner =
+        role === "coach"
+          ? message.coach_id === userId
+          : message.player_id === userId;
+      if (!isOwner) {
+        return res.status(404).json({
+          message: "Message not found",
+          response: null,
+          error: "Message not found",
+        });
+      }
+
+      await messagingQueries.removeMessage(parseInt(messageId));
+      emitToThread(message.thread_id, "message_removed", { messageId });
+
+      return res.status(200).json({
+        message: "Message removed successfully",
         response: null,
-        error: "Reaction not found",
+        error: null,
+      });
+    } catch (error: any) {
+      const statusCode = error.message === "Thread not found" ? 404 : 403;
+      return res.status(statusCode).json({
+        message: error.message || "Failed to remove message",
+        response: null,
+        error: error.message,
       });
     }
+  },
+);
 
-    await messagingQueries.removeReaction(parseInt(reactionId));
-    emitToThread(reaction.message.thread_id, "reaction_removed", { reactionId });
+export const deleteThread = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.decoded.userId as number;
+    const { threadId } = req.params;
+    const role = req.decoded.permissionLevel ? "coach" : "player";
 
-    return res.status(200).json({
-      message: "Reaction removed successfully",
-      response: null,
-      error: null,
-    });
-  } catch (error: any) {
-    const statusCode = error.message === "Thread not found" ? 404 : 403;
-    return res.status(statusCode).json({
-      message: error.message || "Failed to remove reaction",
-      response: null,
-      error: error.message,
-    });
-  }
-});
+    try {
+      const thread = await messagingQueries.getThread(parseInt(threadId));
+      if (!thread) {
+        return res.status(404).json({
+          message: "Thread not found",
+          response: null,
+          error: "Thread not found",
+        });
+      }
 
-export const deleteMessage = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.decoded.userId as number;
-  const { messageId } = req.params;
-  const role = req.decoded.permissionLevel ? "coach" : "player";
+      await messagingQueries.checkThreadAccess(
+        parseInt(threadId),
+        userId,
+        role,
+      );
+      await messagingQueries.removeThread(parseInt(threadId));
+      emitToThread(threadId, "thread_deleted", { threadId });
 
-  try {
-    const message = await messagingQueries.getMessage(parseInt(messageId));
-    if (!message) {
-      return res.status(404).json({
-        message: "Message not found",
+      return res.status(200).json({
+        message: "Thread deleted successfully",
         response: null,
-        error: "Message not found",
+        error: null,
+      });
+    } catch (error: any) {
+      const statusCode = error.message === "Thread not found" ? 404 : 403;
+      return res.status(statusCode).json({
+        message: error.message || "Failed to delete thread",
+        response: null,
+        error: error.message,
       });
     }
-    const isOwner =
-      role === "coach"
-        ? message.coach_id === userId
-        : message.player_id === userId;
-    if (!isOwner) {
-      return res.status(404).json({
-        message: "Message not found",
-        response: null,
-        error: "Message not found",
-      });
-    }
-
-    await messagingQueries.removeMessage(parseInt(messageId));
-    emitToThread(message.thread_id, "message_removed", { messageId });
-
-    return res.status(200).json({
-      message: "Message removed successfully",
-      response: null,
-      error: null,
-    });
-  } catch (error: any) {
-    const statusCode = error.message === "Thread not found" ? 404 : 403;
-    return res.status(statusCode).json({
-      message: error.message || "Failed to remove message",
-      response: null,
-      error: error.message,
-    });
-  }
-});
-
-export const deleteThread = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.decoded.userId as number;
-  const { threadId } = req.params;
-  const role = req.decoded.permissionLevel ? "coach" : "player";
-
-  try {
-    await messagingQueries.checkThreadAccess(parseInt(threadId), userId, role);
-    await messagingQueries.removeThread(parseInt(threadId));
-    emitToThread(threadId, "thread_deleted", { threadId });
-
-    return res.status(200).json({
-      message: "Thread deleted successfully",
-      response: null,
-      error: null,
-    });
-  } catch (error: any) {
-    const statusCode = error.message === "Thread not found" ? 404 : 403;
-    return res.status(statusCode).json({
-      message: error.message || "Failed to delete thread",
-      response: null,
-      error: error.message,
-    });
-  }
-});
+  },
+);
